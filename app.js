@@ -5,6 +5,81 @@
 
 'use strict';
 
+// ─── ROLE / AUTH ─────────────────────────────────────
+const ADMIN_PIN = 'admin123';
+let currentRole = null; // 'user' | 'admin'
+
+function selectRole(role) {
+  // Clear previous selection styling
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  const pinSection = document.getElementById('admin-pin-section');
+  document.getElementById('pin-error').textContent = '';
+
+  if (role === 'admin') {
+    document.getElementById('role-admin-btn').classList.add('selected');
+    pinSection.classList.add('visible');
+    setTimeout(() => document.getElementById('admin-pin-input').focus(), 100);
+  } else {
+    document.getElementById('role-user-btn').classList.add('selected');
+    pinSection.classList.remove('visible');
+    enterApp('user');
+  }
+}
+
+function confirmAdminPin() {
+  const pin = document.getElementById('admin-pin-input').value;
+  const errEl = document.getElementById('pin-error');
+  if (pin === ADMIN_PIN) {
+    errEl.textContent = '';
+    enterApp('admin');
+  } else {
+    errEl.textContent = '❌ Incorrect PIN. Please try again.';
+    document.getElementById('admin-pin-input').value = '';
+    document.getElementById('admin-pin-input').focus();
+  }
+}
+
+function enterApp(role) {
+  currentRole = role;
+  // Hide login, show app shell
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'flex';
+  applyRole(role);
+  seedDemo();
+  if (role === 'admin') {
+    showPage('dashboard');
+  } else {
+    showPage('register');
+  }
+  refreshAll();
+}
+
+function applyRole(role) {
+  const isAdmin = role === 'admin';
+  // Nav items
+  document.querySelectorAll('.nav-item.admin-only').forEach(el => {
+    el.style.display = isAdmin ? '' : 'none';
+  });
+  // Role badge in topbar
+  const badge = document.getElementById('role-badge');
+  if (isAdmin) {
+    badge.innerHTML = `<span class="role-badge-pill admin">⚙ Admin</span>`;
+  } else {
+    badge.innerHTML = `<span class="role-badge-pill user">👤 Patient</span>`;
+  }
+}
+
+function logout() {
+  currentRole = null;
+  document.getElementById('app-shell').style.display = 'none';
+  document.getElementById('login-screen').style.display = '';
+  // Reset PIN field & error
+  document.getElementById('admin-pin-input').value = '';
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('admin-pin-section').classList.remove('visible');
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+}
+
 // ─── STATE ───────────────────────────────────────────
 let patients = JSON.parse(localStorage.getItem('hq_patients') || '[]');
 let counters = JSON.parse(localStorage.getItem('hq_counters') || 'null') || [
@@ -27,6 +102,13 @@ function save() {
 
 // ─── NAVIGATION ──────────────────────────────────────
 function showPage(name) {
+  // Block user from accessing admin-only pages
+  const adminPages = ['dashboard','queue','appointments','doctors','reports'];
+  if (currentRole === 'user' && adminPages.includes(name)) {
+    showToast('⚠ Access denied. Admin only.', 'error');
+    return;
+  }
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const pg = document.getElementById('page-' + name);
@@ -547,6 +629,5 @@ function seedDemo() {
 }
 
 // ─── INIT ─────────────────────────────────────────────
-seedDemo();
-refreshAll();
-showPage('dashboard');
+// Login screen controls the startup — app-shell is hidden by default via CSS
+// seedDemo() and refreshAll() are called by enterApp() after login

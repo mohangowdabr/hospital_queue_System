@@ -12,6 +12,58 @@
 </head>
 <body>
 
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 40 40" fill="none" width="52" height="52">
+        <rect width="40" height="40" rx="10" fill="url(#lgL)"/>
+        <path d="M20 8 L20 32 M8 20 L32 20" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        <defs><linearGradient id="lgL" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#0ea5e9"/><stop offset="100%" stop-color="#0d9488"/></linearGradient></defs>
+      </svg>
+      <div>
+        <h1 class="login-brand">HealthQ</h1>
+        <p class="login-tagline">Digital Queue Management System</p>
+      </div>
+    </div>
+    <p class="login-subtitle">Select your role to continue</p>
+    <div class="role-cards">
+      <button class="role-card" id="role-user-btn" onclick="selectRole('user')">
+        <div class="role-icon user-icon">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <p class="role-name">Patient / User</p>
+        <p class="role-desc">Register yourself &amp; view your queue token</p>
+        <span class="role-tag user-tag">Open Access</span>
+      </button>
+      <button class="role-card" id="role-admin-btn" onclick="selectRole('admin')">
+        <div class="role-icon admin-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l3 6.5L22 9.3l-5 5 1.2 7L12 18l-6.2 3.3L7 14.3 2 9.3l7-.8L12 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </div>
+        <p class="role-name">Administrator</p>
+        <p class="role-desc">Full access — queue, counters, reports &amp; more</p>
+        <span class="role-tag admin-tag">Requires PIN</span>
+      </button>
+    </div>
+    <div class="admin-pin-section" id="admin-pin-section">
+      <label class="pin-label">Enter Admin PIN</label>
+      <div class="pin-wrap">
+        <input type="password" id="admin-pin-input" maxlength="20" placeholder="••••••" autocomplete="off" onkeydown="if(event.key==='Enter') confirmAdminPin()" />
+        <button class="btn-primary" id="pin-confirm-btn" onclick="confirmAdminPin()">Enter</button>
+      </div>
+      <p class="pin-hint">Default PIN: <span class="pin-highlight">admin123</span></p>
+      <p class="pin-error" id="pin-error"></p>
+    </div>
+    <div class="login-footer">
+      <span class="live-dot" style="width:7px;height:7px;display:inline-block;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse-dot 2s infinite;margin-right:6px;"></span>
+      City Health Camp 2026 — System Live
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APP SHELL (hidden until login) ===================== -->
+<div class="app-shell" id="app-shell">
+
 <!-- ===================== SIDEBAR NAV ===================== -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
@@ -30,33 +82,38 @@
     <span class="logo-text">HealthQ</span>
   </div>
 
-  <nav class="sidebar-nav">
-    <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard">
+  <nav class="sidebar-nav" id="sidebar-nav">
+    <!-- Admin-only -->
+    <a href="#" class="nav-item admin-only active" data-page="dashboard" id="nav-dashboard">
       <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"/><rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor" opacity=".6"/><rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor" opacity=".6"/><rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor" opacity=".4"/></svg>
       <span>Dashboard</span>
     </a>
+    <!-- User & Admin -->
     <a href="#" class="nav-item" data-page="register" id="nav-register">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 11l2 2-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       <span>Register Patient</span>
     </a>
-    <a href="#" class="nav-item" data-page="queue" id="nav-queue">
+    <!-- Admin-only -->
+    <a href="#" class="nav-item admin-only" data-page="queue" id="nav-queue">
       <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       <span>Live Queue</span>
       <span class="nav-badge" id="queue-badge">0</span>
     </a>
+    <!-- User & Admin -->
     <a href="#" class="nav-item" data-page="display" id="nav-display">
       <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 18v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       <span>Token Display</span>
     </a>
-    <a href="#" class="nav-item" data-page="appointments" id="nav-appointments">
+    <!-- Admin-only -->
+    <a href="#" class="nav-item admin-only" data-page="appointments" id="nav-appointments">
       <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       <span>Appointments</span>
     </a>
-    <a href="#" class="nav-item" data-page="doctors" id="nav-doctors">
+    <a href="#" class="nav-item admin-only" data-page="doctors" id="nav-doctors">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       <span>Doctors / Counters</span>
     </a>
-    <a href="#" class="nav-item" data-page="reports" id="nav-reports">
+    <a href="#" class="nav-item admin-only" data-page="reports" id="nav-reports">
       <svg viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 16l4-5 4 3 4-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Reports</span>
     </a>
@@ -93,11 +150,16 @@
         <span>LIVE</span>
       </div>
       <div class="clock" id="clock">00:00:00</div>
+      <div class="role-badge" id="role-badge"></div>
+      <button class="logout-btn" id="logout-btn" onclick="logout()">
+        <svg viewBox="0 0 24 24" fill="none" width="15" height="15"><path d="M17 16l4-4m0 0l-4-4m4 4H7M13 20H5a2 2 0 01-2-2V6a2 2 0 012-2h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Logout
+      </button>
     </div>
   </header>
 
-  <!-- =========== PAGE: DASHBOARD =========== -->
-  <section class="page active" id="page-dashboard">
+  <!-- =========== PAGE: DASHBOARD (Admin Only) =========== -->
+  <section class="page admin-page active" id="page-dashboard">
 
     <!-- STATS GRID -->
     <div class="stats-grid">
@@ -323,8 +385,8 @@
     </div>
   </section>
 
-  <!-- =========== PAGE: LIVE QUEUE =========== -->
-  <section class="page" id="page-queue">
+  <!-- =========== PAGE: LIVE QUEUE (Admin Only) =========== -->
+  <section class="page admin-page" id="page-queue">
     <div class="queue-controls">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -419,8 +481,8 @@
     </div>
   </section>
 
-  <!-- =========== PAGE: APPOINTMENTS =========== -->
-  <section class="page" id="page-appointments">
+  <!-- =========== PAGE: APPOINTMENTS (Admin Only) =========== -->
+  <section class="page admin-page" id="page-appointments">
     <div class="card appt-card">
       <div class="card-header">
         <h2>Appointments</h2>
@@ -446,8 +508,8 @@
     </div>
   </section>
 
-  <!-- =========== PAGE: DOCTORS / COUNTERS =========== -->
-  <section class="page" id="page-doctors">
+  <!-- =========== PAGE: DOCTORS / COUNTERS (Admin Only) =========== -->
+  <section class="page admin-page" id="page-doctors">
     <div class="card" style="padding:1.5rem;">
       <div class="card-header">
         <h2>Doctors &amp; Counters</h2>
@@ -459,8 +521,8 @@
     </div>
   </section>
 
-  <!-- =========== PAGE: REPORTS =========== -->
-  <section class="page" id="page-reports">
+  <!-- =========== PAGE: REPORTS (Admin Only) =========== -->
+  <section class="page admin-page" id="page-reports">
     <div class="reports-grid">
       <div class="card report-stat">
         <h3>Total Patients Today</h3>
@@ -497,6 +559,8 @@
   </section>
 
 </main>
+
+</div><!-- end #app-shell -->
 
 <!-- =========== ADD COUNTER MODAL =========== -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
