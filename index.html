@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthQ – Digital Queue Management for Health Camps</title>
+  <meta name="description" content="HealthQ is a token-based digital queue and appointment management system for health camps and PHCs. Manage patient flow efficiently with real-time queue tracking." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ===================== SIDEBAR NAV ===================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="10" fill="url(#lg1)"/>
+        <path d="M20 8 L20 32 M8 20 L32 20" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="lg1" x1="0" y1="0" x2="40" y2="40">
+            <stop offset="0%" stop-color="#0ea5e9"/>
+            <stop offset="100%" stop-color="#0d9488"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <span class="logo-text">HealthQ</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"/><rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor" opacity=".6"/><rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor" opacity=".6"/><rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor" opacity=".4"/></svg>
+      <span>Dashboard</span>
+    </a>
+    <a href="#" class="nav-item" data-page="register" id="nav-register">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 11l2 2-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Register Patient</span>
+    </a>
+    <a href="#" class="nav-item" data-page="queue" id="nav-queue">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Live Queue</span>
+      <span class="nav-badge" id="queue-badge">0</span>
+    </a>
+    <a href="#" class="nav-item" data-page="display" id="nav-display">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 18v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Token Display</span>
+    </a>
+    <a href="#" class="nav-item" data-page="appointments" id="nav-appointments">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Appointments</span>
+    </a>
+    <a href="#" class="nav-item" data-page="doctors" id="nav-doctors">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Doctors / Counters</span>
+    </a>
+    <a href="#" class="nav-item" data-page="reports" id="nav-reports">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 16l4-5 4 3 4-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Reports</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="camp-info">
+      <div class="camp-dot"></div>
+      <div>
+        <p class="camp-name">City Health Camp 2026</p>
+        <p class="camp-date">Nov 2, 2026</p>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== MAIN CONTENT ===================== -->
+<main class="main-content">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" id="menuBtn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="page-title-wrap">
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+        <p class="page-subtitle" id="page-subtitle">City Health Camp — Live Overview</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-indicator">
+        <span class="live-dot"></span>
+        <span>LIVE</span>
+      </div>
+      <div class="clock" id="clock">00:00:00</div>
+    </div>
+  </header>
+
+  <!-- =========== PAGE: DASHBOARD =========== -->
+  <section class="page active" id="page-dashboard">
+
+    <!-- STATS GRID -->
+    <div class="stats-grid">
+      <div class="stat-card card-blue">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Registered</span>
+          <span class="stat-value" id="stat-total">0</span>
+          <span class="stat-change positive">Today</span>
+        </div>
+      </div>
+      <div class="stat-card card-teal">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">In Queue</span>
+          <span class="stat-value" id="stat-waiting">0</span>
+          <span class="stat-change neutral">Waiting</span>
+        </div>
+      </div>
+      <div class="stat-card card-green">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Completed</span>
+          <span class="stat-value" id="stat-done">0</span>
+          <span class="stat-change positive">Served</span>
+        </div>
+      </div>
+      <div class="stat-card card-purple">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M9 21V9" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Now Serving</span>
+          <span class="stat-value" id="stat-current">—</span>
+          <span class="stat-change neutral">Token #</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDDLE ROW -->
+    <div class="mid-row">
+      <!-- QUEUE PROGRESS -->
+      <div class="card queue-progress-card">
+        <div class="card-header">
+          <h2>Queue Progress</h2>
+          <span class="badge-live">Live</span>
+        </div>
+        <div class="queue-visual" id="queue-visual">
+          <p class="empty-state">No patients in queue yet. Register patients to get started.</p>
+        </div>
+      </div>
+
+      <!-- COUNTERS STATUS -->
+      <div class="card counters-card">
+        <div class="card-header">
+          <h2>Counter Status</h2>
+          <button class="btn-sm" onclick="showPage('doctors')">Manage</button>
+        </div>
+        <div class="counters-list" id="counters-list">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT TOKENS TABLE -->
+    <div class="card recent-card">
+      <div class="card-header">
+        <h2>Recent Tokens</h2>
+        <button class="btn-sm" onclick="showPage('queue')">View All</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="recent-table">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Patient Name</th>
+              <th>Age / Gender</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="recent-tbody">
+            <tr><td colspan="6" class="empty-td">No records yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========== PAGE: REGISTER =========== -->
+  <section class="page" id="page-register">
+    <div class="register-layout">
+      <div class="card register-card">
+        <div class="register-header">
+          <div class="register-icon">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <h2>New Patient Registration</h2>
+            <p>Fill details to generate a queue token</p>
+          </div>
+        </div>
+
+        <form id="register-form" autocomplete="off">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="p-name">Full Name *</label>
+              <input type="text" id="p-name" placeholder="e.g. Ravi Kumar" required />
+            </div>
+            <div class="form-group">
+              <label for="p-age">Age *</label>
+              <input type="number" id="p-age" placeholder="e.g. 35" min="0" max="120" required />
+            </div>
+            <div class="form-group">
+              <label for="p-gender">Gender *</label>
+              <select id="p-gender" required>
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="p-phone">Phone Number</label>
+              <input type="tel" id="p-phone" placeholder="e.g. 9876543210" />
+            </div>
+            <div class="form-group">
+              <label for="p-dept">Department *</label>
+              <select id="p-dept" required>
+                <option value="">Select Department</option>
+                <option>General Medicine</option>
+                <option>Pediatrics</option>
+                <option>Gynecology</option>
+                <option>Eye Care</option>
+                <option>Dental</option>
+                <option>Orthopedics</option>
+                <option>Dermatology</option>
+                <option>ENT</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="p-priority">Priority</label>
+              <select id="p-priority">
+                <option value="normal">Normal</option>
+                <option value="senior">Senior Citizen (60+)</option>
+                <option value="emergency">Emergency</option>
+                <option value="pregnant">Pregnant Woman</option>
+              </select>
+            </div>
+            <div class="form-group full-width">
+              <label for="p-complaint">Chief Complaint</label>
+              <textarea id="p-complaint" placeholder="Briefly describe symptoms..." rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="p-appt-date">Appointment Date</label>
+              <input type="date" id="p-appt-date" />
+            </div>
+            <div class="form-group">
+              <label for="p-appt-time">Preferred Time</label>
+              <select id="p-appt-time">
+                <option>09:00 AM</option>
+                <option>09:30 AM</option>
+                <option>10:00 AM</option>
+                <option>10:30 AM</option>
+                <option>11:00 AM</option>
+                <option>11:30 AM</option>
+                <option>12:00 PM</option>
+                <option>02:00 PM</option>
+                <option>02:30 PM</option>
+                <option>03:00 PM</option>
+                <option>03:30 PM</option>
+                <option>04:00 PM</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="reset" class="btn-outline" id="reset-form-btn">Clear</button>
+            <button type="submit" class="btn-primary" id="register-submit-btn">
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M12 5v14M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Generate Token
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TOKEN SLIP PANEL -->
+      <div class="token-slip-panel" id="token-slip-panel">
+        <div class="card token-slip" id="token-slip">
+          <div class="token-slip-top">
+            <div class="slip-logo">
+              <svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+                <rect width="40" height="40" rx="10" fill="url(#lg2)"/>
+                <path d="M20 8 L20 32 M8 20 L32 20" stroke="white" stroke-width="4" stroke-linecap="round"/>
+                <defs><linearGradient id="lg2" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#0ea5e9"/><stop offset="100%" stop-color="#0d9488"/></linearGradient></defs>
+              </svg>
+            </div>
+            <div>
+              <p class="slip-title">HealthQ</p>
+              <p class="slip-subtitle">City Health Camp 2026</p>
+            </div>
+          </div>
+          <div class="token-number-display" id="slip-token">—</div>
+          <div class="slip-details">
+            <div class="slip-row"><span>Patient</span><strong id="slip-name">—</strong></div>
+            <div class="slip-row"><span>Department</span><strong id="slip-dept">—</strong></div>
+            <div class="slip-row"><span>Priority</span><strong id="slip-priority">—</strong></div>
+            <div class="slip-row"><span>Time</span><strong id="slip-time">—</strong></div>
+            <div class="slip-row"><span>Ahead in Queue</span><strong id="slip-ahead">—</strong></div>
+            <div class="slip-row"><span>Est. Wait</span><strong id="slip-wait">—</strong></div>
+          </div>
+          <div class="slip-note">Please wait in the designated area. Your token will be announced on the display board.</div>
+          <button class="btn-primary full-btn" onclick="printSlip()">🖨️ Print Token</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========== PAGE: LIVE QUEUE =========== -->
+  <section class="page" id="page-queue">
+    <div class="queue-controls">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="queue-search" placeholder="Search by name or token…" oninput="renderQueue()" />
+      </div>
+      <div class="filter-wrap">
+        <select id="dept-filter" onchange="renderQueue()">
+          <option value="">All Departments</option>
+          <option>General Medicine</option>
+          <option>Pediatrics</option>
+          <option>Gynecology</option>
+          <option>Eye Care</option>
+          <option>Dental</option>
+          <option>Orthopedics</option>
+          <option>Dermatology</option>
+          <option>ENT</option>
+        </select>
+        <select id="status-filter" onchange="renderQueue()">
+          <option value="">All Status</option>
+          <option value="waiting">Waiting</option>
+          <option value="called">Called</option>
+          <option value="done">Done</option>
+          <option value="skip">Skipped</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card queue-table-card">
+      <div class="card-header">
+        <h2>Patient Queue</h2>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-outline btn-sm" onclick="callNext()">📢 Call Next</button>
+          <button class="btn-primary btn-sm" onclick="showPage('register')">+ Add Patient</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Patient Name</th>
+              <th>Age/Sex</th>
+              <th>Department</th>
+              <th>Priority</th>
+              <th>Reg. Time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="queue-tbody">
+            <tr><td colspan="8" class="empty-td">No patients registered yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========== PAGE: TOKEN DISPLAY (Kiosk) =========== -->
+  <section class="page" id="page-display">
+    <div class="display-board">
+      <div class="display-header">
+        <svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+          <rect width="40" height="40" rx="10" fill="url(#lg3)"/>
+          <path d="M20 8 L20 32 M8 20 L32 20" stroke="white" stroke-width="4" stroke-linecap="round"/>
+          <defs><linearGradient id="lg3" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#0ea5e9"/><stop offset="100%" stop-color="#0d9488"/></linearGradient></defs>
+        </svg>
+        <span>HealthQ — Token Display Board</span>
+        <span class="live-dot"></span>
+      </div>
+
+      <div class="display-main">
+        <div class="display-now-serving">
+          <p class="disp-label">NOW SERVING</p>
+          <div class="disp-token-number" id="disp-current">—</div>
+          <p class="disp-dept" id="disp-dept">—</p>
+          <p class="disp-counter" id="disp-counter">Please proceed to counter</p>
+        </div>
+        <div class="display-divider"></div>
+        <div class="display-upcoming">
+          <p class="disp-label">NEXT TOKENS</p>
+          <div class="upcoming-list" id="upcoming-list">
+            <p class="empty-state" style="color:#94a3b8">Queue is empty</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="display-footer">
+        <span id="disp-total-waiting">Waiting: 0</span>
+        <span id="disp-total-done">Served: 0</span>
+        <span id="disp-clock">--:--</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========== PAGE: APPOINTMENTS =========== -->
+  <section class="page" id="page-appointments">
+    <div class="card appt-card">
+      <div class="card-header">
+        <h2>Appointments</h2>
+        <button class="btn-primary btn-sm" onclick="showPage('register')">+ Book Appointment</button>
+      </div>
+
+      <div class="appt-tabs">
+        <button class="appt-tab active" onclick="filterAppt(this,'today')" data-filter="today">Today</button>
+        <button class="appt-tab" onclick="filterAppt(this,'upcoming')" data-filter="upcoming">Upcoming</button>
+        <button class="appt-tab" onclick="filterAppt(this,'all')" data-filter="all">All</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Token</th><th>Patient</th><th>Department</th><th>Date</th><th>Time</th><th>Priority</th><th>Status</th></tr>
+          </thead>
+          <tbody id="appt-tbody">
+            <tr><td colspan="7" class="empty-td">No appointments booked yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========== PAGE: DOCTORS / COUNTERS =========== -->
+  <section class="page" id="page-doctors">
+    <div class="card" style="padding:1.5rem;">
+      <div class="card-header">
+        <h2>Doctors &amp; Counters</h2>
+        <button class="btn-primary btn-sm" onclick="openAddCounterModal()">+ Add Counter</button>
+      </div>
+      <div class="counters-grid" id="doctor-grid">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- =========== PAGE: REPORTS =========== -->
+  <section class="page" id="page-reports">
+    <div class="reports-grid">
+      <div class="card report-stat">
+        <h3>Total Patients Today</h3>
+        <div class="report-num" id="rep-total">0</div>
+      </div>
+      <div class="card report-stat">
+        <h3>Served</h3>
+        <div class="report-num green-num" id="rep-done">0</div>
+      </div>
+      <div class="card report-stat">
+        <h3>Waiting</h3>
+        <div class="report-num yellow-num" id="rep-waiting">0</div>
+      </div>
+      <div class="card report-stat">
+        <h3>Skipped</h3>
+        <div class="report-num red-num" id="rep-skip">0</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:1.5rem; margin-top:1.5rem;">
+      <div class="card-header"><h2>Department-wise Summary</h2></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Department</th><th>Total</th><th>Served</th><th>Waiting</th><th>Skipped</th></tr></thead>
+          <tbody id="dept-report-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="padding:1.5rem; margin-top:1.5rem;">
+      <div class="card-header"><h2>Patients per Department</h2></div>
+      <div class="bar-chart" id="bar-chart"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- =========== ADD COUNTER MODAL =========== -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add / Edit Counter</h2>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <form id="counter-form">
+      <div class="form-group">
+        <label>Counter Name *</label>
+        <input type="text" id="c-name" placeholder="e.g. Counter 1 / Dr. Sharma" required />
+      </div>
+      <div class="form-group">
+        <label>Doctor Name</label>
+        <input type="text" id="c-doctor" placeholder="e.g. Dr. Meera Nair" />
+      </div>
+      <div class="form-group">
+        <label>Assigned Department</label>
+        <select id="c-dept">
+          <option value="">All</option>
+          <option>General Medicine</option>
+          <option>Pediatrics</option>
+          <option>Gynecology</option>
+          <option>Eye Care</option>
+          <option>Dental</option>
+          <option>Orthopedics</option>
+          <option>Dermatology</option>
+          <option>ENT</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="c-status">
+          <option value="active">Active</option>
+          <option value="break">On Break</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-primary">Save Counter</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- =========== TOAST NOTIFICATION =========== -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
